@@ -1,12 +1,11 @@
 /* ===== AUTHFLOW PRO - MODERN STYLING ===== */
-/* Integrated with Harley Suite Design System */
 
 :root {
     /* Color System - IMPROVED CONTRAST */
-  --primary: #5a8585;
-  --primary-dark: #0a0a0a;
-  --primary-light: #cddbdf;
-    --secondary: #98c4cf;
+    --primary: #5a8585;
+    --primary-dark: #0a0a0a;
+    --primary-light: #cddbdf;
+    --secondary: #1c2122;
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
@@ -28,20 +27,25 @@
     /* App Specific - IMPROVED CONTRAST */
     --bg-primary: var(--darker);
     --bg-secondary: var(--gray-900);
-    --bg-tertiary: var(--gray-800);
+    --bg-tertiary: var(--darker);
     
-    /* CRITICAL FIX: Much lighter text colors */
+    /* CRITICAL FIX: Much lighter text colors and ADDED MISSING VARIABLES */
     --text-primary: #ffffff;        /* Pure white for main text */
     --text-secondary: #e2e8f0;      /* Very light gray */
     --text-tertiary: #cbd5e1;       /* Light gray - was too dark */
     --text-muted: #e4e8ee;          /* Medium gray for less important */
     
+    /* ADD THE MISSING VARIABLES THAT YOUR CODE REFERENCES */
+    --text-color: #ffffff;          /* Added this missing variable */
+    --card-bg: rgba(15, 23, 42, 0.95); /* Added for enhanced cards */
+    --border-color: rgba(255, 255, 255, 0.15);
+    --primary-color: #5a8585;       /* Added for consistency */
+    
     --accent-primary: var(--primary);
     --accent-secondary: var(--primary-light);
-    --border-color: rgba(255, 255, 255, 0.15);
     
     /* RGB values for rgba usage */
-    --primary-rgb: 99, 102, 241;
+    --primary-rgb: 90, 133, 133;    /* Updated to match your primary color */
     --success-rgb: 16, 185, 129;
     --warning-rgb: 245, 158, 11;
     --danger-rgb: 239, 68, 68;
@@ -55,6 +59,7 @@
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 /* Base Styles */
 * {
     margin: 0;
@@ -106,7 +111,7 @@ p {
 
 /* Header & Navigation - IMPROVED TEXT VISIBILITY */
 .app-header {
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     padding: 1rem 0;
@@ -173,7 +178,7 @@ p {
 }
 
 .auth-card {
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--border-radius-xl);
@@ -334,8 +339,8 @@ p {
 
 /* Cards - IMPROVED TEXT CONTRAST */
 .card {
-    background: rgba(53, 98, 119, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgb(0, 0, 0);
+    border: 1px solid rgb(0, 0, 0);
     border-radius: var(--border-radius-lg);
     backdrop-filter: blur(20px);
     box-shadow: var(--shadow);
@@ -384,8 +389,8 @@ p {
 }
 
 .stat-card {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.15) 100%);
-    border: 1px solid rgba(16, 16, 17, 0.3);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.15) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.3);
     border-radius: var(--border-radius-lg);
     padding: 1.5rem;
     text-align: center;
@@ -400,7 +405,7 @@ p {
 .stat-value {
     font-size: 2.5rem;
     font-weight: 700;
-    color: var(--accent-primary);
+    color: var(#fff);
     line-height: 1;
     margin-bottom: 0.5rem;
 }
@@ -412,49 +417,41 @@ p {
 }
 
 /* Account Cards - BETTER TEXT VISIBILITY */
-.account-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: rgba(11, 21, 26, 0.021);
+.accounts-grid-enhanced {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.account-card-enhanced {
+    background: var rgba(0, 0, 0, 0.95);
     border-radius: var(--border-radius);
-    margin-bottom: 0.75rem;
-    transition: var(--transition);
-    border: 1px solid transparent;
+    border: 1px solid var rgba(0, 0, 0, 0.95);
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.account-card:hover {
-    border-color: rgba(99, 189, 241, 0.3);
-    transform: translateX(4px);
-    background: rgba(255, 255, 255, 0.12);
+.account-card-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
-.platform-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--border-radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    background: rgba(0, 0, 0, 0.479);
-    color: var(--accent-primary);
+.account-card-enhanced.totp-account {
+    border-left: 4px solid var(--primary);
 }
 
-.account-info {
-    flex: 1;
+.account-card-enhanced.cookie-account {
+    border-left: 4px solid var(--warning);
 }
 
 .account-name {
     font-weight: 600;
-    color: var(--text-primary); /* White */
+    color: var(--text-primary); /* White - this should now work */
 }
-
 
 .account-username {
     font-size: 0.875rem;
-    color: var(--text-secondary); /* Light gray */
+    color: var(--text-secondary); /* Light gray - this should now work */
 }
 
 .token-code {
@@ -590,7 +587,7 @@ p {
 }
 
 .dropdown-item:hover {
-    background: rgba(99, 102, 241, 0.15);
+    background: rgba(99, 213, 241, 0.15);
     color: var(--accent-primary);
 }
 
@@ -645,8 +642,8 @@ p {
 
 /* License Badge */
 .license-badge {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.15) 100%);
-    border: 1px solid rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.15) 0%, rgb(0, 0, 0) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.4);
     border-radius: 20px;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
@@ -657,7 +654,7 @@ p {
 
 /* License Demo Box */
 .license-demo {
-    background: rgba(99, 102, 241, 0.08);
+    background: rgba(51, 51, 51, 0.08);
     border-radius: var(--border-radius);
     padding: 1.5rem;
     margin: 1.5rem 0;
@@ -736,8 +733,8 @@ p {
 }
 
 .account-card-large {
-    background: linear-gradient(135deg, rgba(15, 39, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, rgb(0, 0, 0) 0%, rgb(0, 0, 0) 100%);
+    border: 1px solid rgb(0, 0, 0);
     border-radius: var(--border-radius-lg);
     padding: 1.5rem;
     backdrop-filter: blur(20px);
@@ -757,7 +754,7 @@ p {
 }
 
 .account-card-large:hover {
-    border-color: rgba(99, 102, 241, 0.4);
+    border-color: rgba(99, 184, 241, 0.4);
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
 }
@@ -810,7 +807,7 @@ p {
 .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(99, 102, 241, 0.3);
+    border: 3px solid rgba(99, 213, 241, 0.3);
     border-top: 3px solid var(--accent-primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -896,7 +893,7 @@ p {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(20px);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1.5rem 0;
@@ -1190,7 +1187,7 @@ p {
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem;
-    background: rgba(0, 0, 0, 0.637);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: var(--border-radius);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -1424,7 +1421,7 @@ p {
 .license-status {
     margin: 1.5rem 0;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(151, 151, 151, 0.171);
     border-radius: var(--border-radius);
 }
 
@@ -1463,7 +1460,7 @@ p {
 /* Platform Badges */
 .platform-badge {
     background: rgba(99, 201, 241, 0.1);
-    color: var(--accent-primary);
+    color: var(#fff);
     padding: 0.25rem 0.75rem;
     border-radius: 12px;
     font-size: 0.75rem;
@@ -1755,7 +1752,7 @@ p {
     gap: 1rem;
     padding: 1rem;
     border-radius: var(--border-radius);
-    background: var(--card-bg);
+    background: var(#3b3d3d);
 }
 
 .summary-item.success {
@@ -1815,7 +1812,7 @@ p {
 }
 
 .account-card-enhanced {
-    background: var(--card-bg);
+    background: rgba(0, 0, 0, 0.95);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
     overflow: hidden;
@@ -1846,7 +1843,7 @@ p {
 
 .account-badge-group {
     background: rgba(var(--primary-rgb), 0.2);
-    color: var(--primary-color);
+    color: var(--primary);
     padding: 0.25rem 0.5rem;
     border-radius: 1rem;
     font-size: 0.75rem;
@@ -1865,12 +1862,12 @@ p {
 
 .account-type-badge.totp {
     background: rgba(var(--primary-rgb), 0.2);
-    color: var(--primary-color);
+    color: var(--primary);
 }
 
 .account-type-badge.cookie {
     background: rgba(var(--warning-rgb), 0.2);
-    color: var(--warning-color);
+    color: var(--warning);
 }
 
 .account-content {
@@ -1879,19 +1876,19 @@ p {
     gap: 1rem;
     padding: 1.5rem;
 }
-
 .account-info {
     flex: 1;
 }
 
+/* FIXED: These were using undefined --text-color variable */
 .account-name {
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--text-primary); /* Changed from --text-color to --text-primary */
     margin-bottom: 0.25rem;
 }
 
 .account-username {
-    color: var(--text-color);
+    color: var(--text-secondary); /* Changed from --text-color to --text-secondary */
     font-size: 0.875rem;
     margin-bottom: 0.5rem;
 }
@@ -1906,7 +1903,7 @@ p {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    color: var(--text-color);
+    color: var(--text-secondary); /* Fixed color */
     font-size: 0.75rem;
 }
 
@@ -1925,6 +1922,38 @@ p {
 .token-display {
     text-align: center;
 }
+
+/* Also fix the regular account cards that were having issues */
+.account-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(11, 21, 26, 0.8); /* Improved background */
+    border-radius: var(--border-radius);
+    margin-bottom: 0.75rem;
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+
+.account-card:hover {
+    border-color: rgba(99, 189, 241, 0.3);
+    transform: translateX(4px);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.platform-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: rgba(22, 22, 22, 0.336); /* Improved contrast */
+    color: var(--accent-primary);
+}
+
 
 /* Enhanced Filtering */
 .filter-stats {

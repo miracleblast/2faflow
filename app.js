@@ -933,153 +933,174 @@ class AuthFlowSPA {
         `;
     }
 
-    getAccountCardTemplate(account) {
-        return `
-            <div class="account-card" data-account-id="${account.id}">
-                <div class="platform-icon platform-${account.platform}">
-                    <i class="bi bi-${account.icon}"></i>
-                </div>
-                <div class="account-info">
-                    <div class="account-name">${account.name}</div>
-                    <div class="account-username">${account.username}</div>
-                </div>
-                <div class="text-end">
-                    <div class="token-code" id="token-${account.id}">Loading...</div>
-                    <div class="token-timer" id="timer-${account.id}">Calculating...</div>
-                </div>
+getAccountCardTemplate(account) {
+    return `
+        <div class="account-card" data-account-id="${account.id}">
+            <div class="platform-icon platform-${account.platform}">
+                <span class="iconify" data-icon="${account.icon}"></span>
             </div>
-        `;
-    }
-
-    getUserItemTemplate(user) {
-        return `
-            <div class="user-item">
-                <div class="user-avatar-sm">${user.initials}</div>
-                <div class="user-details">
-                    <div class="user-name">${user.name}</div>
-                    <div class="user-role">${user.role}</div>
-                </div>
-                <div class="user-status ${user.status === 'online' ? 'online' : 'offline'}"></div>
+            <div class="account-info">
+                <div class="account-name">${account.name}</div>
+                <div class="account-username">${account.username}</div>
             </div>
-        `;
-    }
+            <div class="text-end">
+                <div class="token-code" id="token-${account.id}">Loading...</div>
+                <div class="token-timer" id="timer-${account.id}">Calculating...</div>
+            </div>
+        </div>
+    `;
+}
 
-    getAccountsTemplate() {
-        const accountLimit = this.licenseManager.getAccountLimit();
-        const canAddMore = this.accounts.length < accountLimit;
-        
-        return `
-            <div class="app-wrapper">
-                <header class="app-header">
-                    <div class="app-container">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="#" data-route="dashboard" class="logo">
-                                <i class="bi bi-shield-check"></i>
-                                <span>AuthFlow Pro</span>
-                            </a>
+getUserItemTemplate(user) {
+    return `
+        <div class="user-item">
+            <div class="user-avatar-sm">${user.initials}</div>
+            <div class="user-details">
+                <div class="user-name">${user.name}</div>
+                <div class="user-role">${user.role}</div>
+            </div>
+            <div class="user-status ${user.status === 'online' ? 'online' : 'offline'}"></div>
+        </div>
+    `;
+}
+
+getAccountsTemplate() {
+    const accountLimit = this.licenseManager.getAccountLimit();
+    const canAddMore = this.accounts.length < accountLimit;
+    
+    return `
+        <div class="app-wrapper">
+            <header class="app-header">
+                <div class="app-container">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="#" data-route="dashboard" class="logo">
+                            <span class="iconify" data-icon="mdi:shield-account"></span>
+                            <span>AuthFlow Pro</span>
+                        </a>
+                        
+                        <div class="d-flex align-items-center gap-4">
+                            <nav class="d-flex gap-3 nav-menu">
+                                <a href="#" data-route="dashboard" class="nav-link">
+                                    <span class="iconify" data-icon="mdi:view-dashboard"></span>
+                                    Dashboard
+                                </a>
+                                <a href="#" data-route="accounts" class="nav-link">
+                                    <span class="iconify" data-icon="mdi:account-multiple"></span>
+                                    Accounts
+                                </a>
+                                <a href="#" data-route="users" class="nav-link active">
+                                    <span class="iconify" data-icon="mdi:users"></span>
+                                    Users
+                                </a>
+                                <a href="#" data-route="api-keys" class="nav-link">
+                                    <span class="iconify" data-icon="mdi:key-chain"></span>
+                                    API Keys
+                                </a>
+                                <a href="#" data-route="security-logs" class="nav-link">
+                                    <span class="iconify" data-icon="mdi:shield-account"></span>
+                                    Security Logs
+                                </a>
+                            </nav>
                             
-                            <div class="d-flex align-items-center gap-4">
-                                <nav class="d-flex gap-3 nav-menu">
-                                    <a href="#" data-route="dashboard" class="nav-link">Dashboard</a>
-                                    <a href="#" data-route="accounts" class="nav-link">Accounts</a>
-                                    <a href="#" data-route="users" class="nav-link active">Users</a>
-                                    <a href="#" data-route="api-keys" class="nav-link">API Keys</a>
-                                    <a href="#" data-route="security-logs" class="nav-link">Security Logs</a>
-                                </nav>
-                                
-                                <div class="dropdown">
-                                    <div class="user-avatar" id="userMenu" data-bs-toggle="dropdown">
-                                        <span>${this.userData?.initials || 'JD'}</span>
-                                    </div>
-                                    <ul class="dropdown-menu dropdown-menu-dark">
-                                        <li><a class="dropdown-item" href="#" data-route="settings"><i class="bi bi-gear"></i> Settings</a></li>
-                                        <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
-                                    </ul>
+                            <div class="dropdown">
+                                <div class="user-avatar" id="userMenu" data-bs-toggle="dropdown">
+                                    <span>${this.userData?.initials || 'JD'}</span>
                                 </div>
+                                <ul class="dropdown-menu dropdown-menu-dark">
+                                    <li><a class="dropdown-item" href="#" data-route="settings">
+                                        <span class="iconify" data-icon="mdi:cog"></span>
+                                        Settings
+                                    </a></li>
+                                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn">
+                                        <span class="iconify" data-icon="mdi:logout"></span>
+                                        Logout
+                                    </a></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
-                </header>
+                </div>
+            </header>
 
-                <main class="app-container">
-                    <div class="dashboard-section">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                            <h1 class="section-title">
-                                <i class="bi bi-person-badge"></i>
-                                Account Management
-                            </h1>
-                            <div>
-                                <span class="me-3">${this.accounts.length}/${accountLimit} Accounts</span>
-                                <button class="btn btn-primary d-flex align-items-center gap-2" 
-                                        id="addAccountBtn" ${!canAddMore ? 'disabled' : ''}>
-                                    <i class="bi bi-plus-circle"></i>
-                                    Add Account
-                                </button>
-                            </div>
+            <main class="app-container">
+                <div class="dashboard-section">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <h1 class="section-title">
+                            <span class="iconify" data-icon="mdi:account-badge"></span>
+                            Account Management
+                        </h1>
+                        <div>
+                            <span class="me-3">${this.accounts.length}/${accountLimit} Accounts</span>
+                            <button class="btn btn-primary d-flex align-items-center gap-2" 
+                                    id="addAccountBtn" ${!canAddMore ? 'disabled' : ''}>
+                                <span class="iconify" data-icon="mdi:plus-circle"></span>
+                                Add Account
+                            </button>
                         </div>
+                    </div>
 
-                        ${!canAddMore ? `
-                            <div class="alert alert-warning">
-                                <i class="bi bi-exclamation-triangle"></i>
-                                You've reached your account limit (${accountLimit}). 
-                                <a href="#" onclick="authFlowApp.showPricingModal()" class="alert-link">Upgrade your plan</a> to add more accounts.
-                            </div>
-                        ` : ''}
+                    ${!canAddMore ? `
+                        <div class="alert alert-warning">
+                            <span class="iconify" data-icon="mdi:alert-circle"></span>
+                            You've reached your account limit (${accountLimit}). 
+                            <a href="#" onclick="authFlowApp.showPricingModal()" class="alert-link">Upgrade your plan</a> to add more accounts.
+                        </div>
+                    ` : ''}
 
-                        <div class="card">
-                            <div class="card-header">
-                                <span>All Connected Accounts</span>
-                                <span class="badge bg-primary">${this.accounts.length}</span>
-                            </div>
-                            <div class="card-body">
-                                ${this.accounts.length > 0 ? `
-                                    <div class="accounts-grid">
-                                        ${this.accounts.map(account => `
-                                            <div class="account-card-large">
-                                                <div class="account-header">
-                                                    <div class="platform-icon platform-${account.platform}">
-                                                        <i class="bi bi-${account.icon}"></i>
-                                                    </div>
-                                                    <div class="account-title">
-                                                        <h5>${account.name}</h5>
-                                                        <span>${account.username}</span>
-                                                    </div>
-                                                    <div class="account-actions">
-                                                        <button class="btn btn-sm btn-outline-primary" onclick="authFlowApp.copyToken('${account.id}')">
-                                                            <i class="bi bi-clipboard"></i>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-outline-danger" onclick="authFlowApp.removeAccount('${account.id}')">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>All Connected Accounts</span>
+                            <span class="badge bg-primary">${this.accounts.length}</span>
+                        </div>
+                        <div class="card-body">
+                            ${this.accounts.length > 0 ? `
+                                <div class="accounts-grid">
+                                    ${this.accounts.map(account => `
+                                        <div class="account-card-large">
+                                            <div class="account-header">
+                                                <div class="platform-icon platform-${account.platform}">
+                                                    <span class="iconify" data-icon="${account.icon}"></span>
                                                 </div>
-                                                <div class="account-token">
-                                                    <div class="token-display">
-                                                        <span class="token-code" id="token-${account.id}">Loading...</span>
-                                                        <span class="token-timer" id="timer-${account.id}">Calculating...</span>
-                                                    </div>
+                                                <div class="account-title">
+                                                    <h5>${account.name}</h5>
+                                                    <span>${account.username}</span>
+                                                </div>
+                                                <div class="account-actions">
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="authFlowApp.copyToken('${account.id}')">
+                                                        <span class="iconify" data-icon="mdi:content-copy"></span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="authFlowApp.removeAccount('${account.id}')">
+                                                        <span class="iconify" data-icon="mdi:trash-can"></span>
+                                                    </button>
                                                 </div>
                                             </div>
-                                        `).join('')}
-                                    </div>
-                                ` : `
-                                    <div class="empty-state">
-                                        <i class="bi bi-person-badge"></i>
-                                        <h3>No Accounts Yet</h3>
-                                        <p>Add your first 2FA account to get started</p>
-                                        <button class="btn btn-primary" id="addFirstAccountBtn">
-                                            <i class="bi bi-plus-circle"></i>
-                                            Add Your First Account
-                                        </button>
-                                    </div>
-                                `}
-                            </div>
+                                            <div class="account-token">
+                                                <div class="token-display">
+                                                    <span class="token-code" id="token-${account.id}">Loading...</span>
+                                                    <span class="token-timer" id="timer-${account.id}">Calculating...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : `
+                                <div class="empty-state">
+                                    <span class="iconify" data-icon="mdi:account-badge" style="font-size: 4rem;"></span>
+                                    <h3>No Accounts Yet</h3>
+                                    <p>Add your first 2FA account to get started</p>
+                                    <button class="btn btn-primary" id="addFirstAccountBtn">
+                                        <span class="iconify" data-icon="mdi:plus-circle"></span>
+                                        Add Your First Account
+                                    </button>
+                                </div>
+                            `}
                         </div>
                     </div>
-                </main>
-            </div>
-        `;
-    }
+                </div>
+            </main>
+        </div>
+    `;
+}
 
     getUsersTemplate() {
         const teamLimit = this.licenseManager.getTeamLimit();
