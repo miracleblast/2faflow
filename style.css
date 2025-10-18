@@ -3,15 +3,15 @@
 
 :root {
     /* Color System - IMPROVED CONTRAST */
-    --primary: #6366f1;
-    --primary-dark: #4f46e5;
-    --primary-light: #8b5cf6;
-    --secondary: #64748b;
+  --primary: #5a8585;
+  --primary-dark: #0a0a0a;
+  --primary-light: #cddbdf;
+    --secondary: #98c4cf;
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
-    --dark: #0f172a;
-    --darker: #020617;
+    --dark: #171718;
+    --darker: #000000;
     --light: #f8fafc;
     
     /* IMPROVED TEXT COLORS - MUCH BETTER CONTRAST */
@@ -20,10 +20,10 @@
     --gray-300: #e2e8f0; 
     --gray-400: #cbd5e1;  /* Much lighter for better readability */
     --gray-500: #94a3b8;
-    --gray-600: #64748b;
-    --gray-700: #475569;
-    --gray-800: #334155;
-    --gray-900: #1e293b;  /* Lighter dark */
+    --gray-600: #8894a5;
+    --gray-700: #4e545c;
+    --gray-800: #31353a;
+    --gray-900: #23262b;  /* Lighter dark */
     
     /* App Specific - IMPROVED CONTRAST */
     --bg-primary: var(--darker);
@@ -34,7 +34,7 @@
     --text-primary: #ffffff;        /* Pure white for main text */
     --text-secondary: #e2e8f0;      /* Very light gray */
     --text-tertiary: #cbd5e1;       /* Light gray - was too dark */
-    --text-muted: #94a3b8;          /* Medium gray for less important */
+    --text-muted: #e4e8ee;          /* Medium gray for less important */
     
     --accent-primary: var(--primary);
     --accent-secondary: var(--primary-light);
@@ -76,7 +76,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 0.5rem;
-    color: var(--text-primary);
+    color: var(--text-primary); /* Ensured white */
 }
 
 h1 { font-size: 2.5rem; }
@@ -87,7 +87,7 @@ h5 { font-size: 1.25rem; }
 h6 { font-size: 1.125rem; }
 
 p {
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Much lighter */
 }
 
 /* Layout */
@@ -207,9 +207,10 @@ p {
     gap: 0.5rem;
 }
 
+/* Form Labels - IMPROVED */
 .form-label {
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-primary); /* White instead of gray */
 }
 
 .form-control {
@@ -223,7 +224,7 @@ p {
 }
 
 .form-control::placeholder {
-    color: var(--text-tertiary);
+    color: var(--text-muted); /* Better placeholder contrast */
 }
 
 .form-control:focus {
@@ -333,7 +334,7 @@ p {
 
 /* Cards - IMPROVED TEXT CONTRAST */
 .card {
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(53, 98, 119, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--border-radius-lg);
     backdrop-filter: blur(20px);
@@ -355,11 +356,8 @@ p {
 }
 
 .card-header span {
-    color: var(--text-primary);
-    font-weight: 600;
-    font-size: 1.1rem;
+    color: var(--text-primary); /* White for card headers */
 }
-
 .card-body {
     padding: 1.5rem;
 }
@@ -387,7 +385,7 @@ p {
 
 .stat-card {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.15) 100%);
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    border: 1px solid rgba(16, 16, 17, 0.3);
     border-radius: var(--border-radius-lg);
     padding: 1.5rem;
     text-align: center;
@@ -419,7 +417,7 @@ p {
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(11, 21, 26, 0.021);
     border-radius: var(--border-radius);
     margin-bottom: 0.75rem;
     transition: var(--transition);
@@ -427,7 +425,7 @@ p {
 }
 
 .account-card:hover {
-    border-color: rgba(99, 102, 241, 0.3);
+    border-color: rgba(99, 189, 241, 0.3);
     transform: translateX(4px);
     background: rgba(255, 255, 255, 0.12);
 }
@@ -440,7 +438,7 @@ p {
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    background: rgba(99, 102, 241, 0.15);
+    background: rgba(0, 0, 0, 0.479);
     color: var(--accent-primary);
 }
 
@@ -450,29 +448,31 @@ p {
 
 .account-name {
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-primary); /* White */
 }
+
 
 .account-username {
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Light gray */
 }
 
 .token-code {
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--text-primary); /* White for tokens */
     letter-spacing: 0.1em;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .token-timer {
     font-size: 0.75rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Light gray */
     text-align: right;
     font-weight: 500;
 }
+
 
 /* Quick Actions */
 .quick-actions {
@@ -497,8 +497,8 @@ p {
 }
 
 .action-btn:hover {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: rgba(99, 196, 241, 0.15);
+    border-color: rgba(99, 196, 241, 0.4);
     transform: translateY(-2px);
     color: var(--text-primary);
 }
@@ -511,7 +511,7 @@ p {
 .action-text {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-primary); /* White */
 }
 
 /* User Items */
@@ -555,12 +555,12 @@ p {
 
 .user-name {
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-primary); /* White */
 }
 
 .user-role {
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Light gray */
 }
 
 .user-status {
@@ -576,7 +576,7 @@ p {
 
 /* Dropdown */
 .dropdown-menu {
-    background: rgba(15, 23, 42, 0.98);
+    background: rgba(15, 34, 42, 0.98);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius);
@@ -634,13 +634,13 @@ p {
 .alert-warning {
     background: rgba(245, 158, 11, 0.15);
     border-color: rgba(245, 158, 11, 0.4);
-    color: var(--warning);
+    color: #fdba74; /* Lighter orange */
 }
 
 .alert-info {
     background: rgba(59, 130, 246, 0.15);
     border-color: rgba(59, 130, 246, 0.4);
-    color: #60a5fa;
+    color: #93c5fd; /* Lighter blue */
 }
 
 /* License Badge */
@@ -684,31 +684,31 @@ p {
     border-radius: var(--border-radius);
     font-size: 0.875rem;
     line-height: 1.6;
-    color: var(--text-primary);
+    color: var(--text-secondary); /* Light gray */
 }
 
 /* Empty States */
 .empty-state {
     text-align: center;
     padding: 3rem 1rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Light gray */
 }
 
 .empty-state i {
     font-size: 4rem;
     margin-bottom: 1.5rem;
     opacity: 0.8;
-    color: var(--accent-primary);
+    color: var(--accent-secondary);
 }
 
 .empty-state h3 {
-    color: var(--text-primary);
+    color: var(--text-primary); /* White */
     margin-bottom: 0.75rem;
 }
 
 .empty-state p {
     margin-bottom: 1.5rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Light gray */
 }
 
 /* Token Warning States */
@@ -736,7 +736,7 @@ p {
 }
 
 .account-card-large {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+    background: linear-gradient(135deg, rgba(15, 39, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--border-radius-lg);
     padding: 1.5rem;
@@ -871,7 +871,7 @@ p {
 }
 
 .table th {
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Light gray for headers */
     font-weight: 600;
     font-size: 0.875rem;
     text-transform: uppercase;
@@ -879,7 +879,7 @@ p {
 }
 
 .table td {
-    color: var(--text-primary);
+    color: var(--text-primary); /* White for table data */
 }
 
 .table tbody tr {
@@ -1190,7 +1190,7 @@ p {
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.637);
     border-radius: var(--border-radius);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -1204,7 +1204,7 @@ p {
 }
 
 .api-key-name strong {
-    color: var(--text-primary);
+    color: var(--text-primary); /* White */
     margin-right: 1rem;
 }
 
@@ -1214,14 +1214,14 @@ p {
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Light gray */
 }
 
 .api-key-meta {
     display: flex;
     gap: 1rem;
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: var(--text-muted); /* Medium gray */
 }
 
 .api-key-actions {
@@ -1238,7 +1238,7 @@ p {
     font-family: 'SF Mono', monospace;
     font-size: 0.875rem;
     line-height: 1.5;
-    color: var(--text-primary);
+    color: var(--text-secondary); /* Light gray */
 }
 
 /* Usage Stats */
@@ -1272,23 +1272,23 @@ p {
     gap: 1.5rem;
 }
 
-.permission-item h6 {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-    color: var(--text-primary);
-}
-
 .permission-item ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
+.permission-item h6 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary); /* White */
+}
+
 .permission-item li {
     padding: 0.25rem 0;
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Light gray */
     font-size: 0.875rem;
 }
 
@@ -1352,13 +1352,13 @@ p {
 
 .timeline-action {
     font-weight: 500;
-    color: var(--text-primary);
+    color: var(--text-primary); /* White */
     margin-bottom: 0.25rem;
 }
 
 .timeline-meta {
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Light gray */
 }
 
 /* Settings */
@@ -1406,7 +1406,7 @@ p {
 
 .license-plan h4 {
     margin-bottom: 0.5rem;
-    color: var(--text-primary);
+    color: var(--text-primary); /* White */
 }
 
 .license-features {
@@ -1462,7 +1462,7 @@ p {
 
 /* Platform Badges */
 .platform-badge {
-    background: rgba(99, 102, 241, 0.1);
+    background: rgba(99, 201, 241, 0.1);
     color: var(--accent-primary);
     padding: 0.25rem 0.75rem;
     border-radius: 12px;
@@ -1473,12 +1473,12 @@ p {
 /* Event Time */
 .event-time {
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-primary); /* White */
 }
 
 .event-date {
     font-size: 0.75rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* Light gray */
 }
 
 /* Form Switch */
@@ -1891,7 +1891,7 @@ p {
 }
 
 .account-username {
-    color: var(--text-muted);
+    color: var(--text-color);
     font-size: 0.875rem;
     margin-bottom: 0.5rem;
 }
@@ -1906,7 +1906,7 @@ p {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    color: var(--text-muted);
+    color: var(--text-color);
     font-size: 0.75rem;
 }
 
