@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthFlow Pro | Multi-Account 2FA Manager - By Harambee</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Secure 2FA management for marketing agencies and teams">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- Google Fonts for Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Crypto Libraries for Real TOTP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.hmac.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.sha1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.enc-base64.min.js"></script>
+    
+    <!-- Bootstrap JS for Modals -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- SPA Container -->
+    <div id="app">
+        <div id="loading" class="loading-screen">
+            <div class="logo">
+                <i class="bi bi-shield-check"></i>
+                <span>AuthFlow Pro</span>
+            </div>
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Global Footer for Auth Pages -->
+    <footer class="global-auth-footer" id="globalAuthFooter" style="display: none;">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#" onclick="authFlowApp.showTerms()">Terms of Service</a>
+                <a href="#" onclick="authFlowApp.showPrivacy()">Privacy Policy</a>
+                <a href="mailto:support@harambee.com">Support</a>
+            </div>
+            <div class="footer-copyright">
+                &copy; 2024 Harambee. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Global Pricing Modal -->
+    <div class="modal fade" id="globalPricingModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Choose Your Plan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="pricing-grid">
+                        <div class="pricing-card">
+                            <div class="pricing-header">
+                                <h3>Starter</h3>
+                                <div class="price">$9.99<span>/month</span></div>
+                                <p class="price-description">Perfect for freelancers</p>
+                            </div>
+                            <ul class="features-list">
+                                <li><i class="bi bi-check"></i> Up to 10 accounts</li>
+                                <li><i class="bi bi-check"></i> 3 team members</li>
+                                <li><i class="bi bi-check"></i> Basic 2FA management</li>
+                                <li><i class="bi bi-x"></i> API Access</li>
+                                <li><i class="bi bi-x"></i> Priority Support</li>
+                            </ul>
+                            <button class="btn btn-outline-primary w-100" onclick="authFlowApp.selectPlan('starter')">
+                                Select Starter
+                            </button>
+                        </div>
+
+                        <div class="pricing-card featured">
+                            <div class="pricing-badge">Most Popular</div>
+                            <div class="pricing-header">
+                                <h3>Professional</h3>
+                                <div class="price">$15.99<span>/month</span></div>
+                                <p class="price-description">Ideal for agencies</p>
+                            </div>
+                            <ul class="features-list">
+                                <li><i class="bi bi-check"></i> Up to 50 accounts</li>
+                                <li><i class="bi bi-check"></i> 10 team members</li>
+                                <li><i class="bi bi-check"></i> Advanced 2FA management</li>
+                                <li><i class="bi bi-check"></i> API Access</li>
+                                <li><i class="bi bi-check"></i> Priority Support</li>
+                            </ul>
+                            <button class="btn btn-primary w-100" onclick="authFlowApp.selectPlan('professional')">
+                                Select Professional
+                            </button>
+                        </div>
+
+                        <div class="pricing-card">
+                            <div class="pricing-header">
+                                <h3>Enterprise</h3>
+                                <div class="price">$49.99<span>/month</span></div>
+                                <p class="price-description">For large teams</p>
+                            </div>
+                            <ul class="features-list">
+                                <li><i class="bi bi-check"></i> Unlimited accounts</li>
+                                <li><i class="bi bi-check"></i> 25+ team members</li>
+                                <li><i class="bi bi-check"></i> Enterprise features</li>
+                                <li><i class="bi bi-check"></i> Full API Access</li>
+                                <li><i class="bi bi-check"></i> 24/7 Premium Support</li>
+                            </ul>
+                            <button class="btn btn-outline-primary w-100" onclick="authFlowApp.selectPlan('enterprise')">
+                                Select Enterprise
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    
+    <!-- Register Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('✅ Service Worker registered'))
+                    .catch(err => console.log('❌ Service Worker registration failed'));
+            });
+        }
+    </script>
+</body>
+</html>
