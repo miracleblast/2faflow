@@ -981,8 +981,8 @@ class AuthFlowSPA {
                             <div class="d-flex align-items-center gap-4">
                                 <nav class="d-flex gap-3 nav-menu">
                                     <a href="#" data-route="dashboard" class="nav-link">Dashboard</a>
-                                    <a href="#" data-route="accounts" class="nav-link active">Accounts</a>
-                                    <a href="#" data-route="users" class="nav-link">Users</a>
+                                    <a href="#" data-route="accounts" class="nav-link">Accounts</a>
+                                    <a href="#" data-route="users" class="nav-link active">Users</a>
                                     <a href="#" data-route="api-keys" class="nav-link">API Keys</a>
                                     <a href="#" data-route="security-logs" class="nav-link">Security Logs</a>
                                 </nav>
@@ -2326,7 +2326,1401 @@ POST /api/v1/tokens/generate<br>
     }
 }
 
-// ============ INITIALIZE APP ============
+// ============ AUTHFLOW PRO - COMPLETE SPA PWA ============
+// Enhanced with Bulk Import, Cookie Auth, Advanced Filtering & Performance Optimizations
+
+// ============ ENCRYPTION SERVICE ============
+class EncryptionService {
+    constructor() {
+        this.algorithm = 'AES-GCM';
+        this.key = null;
+    }
+
+    async generateKey() {
+        if (!this.key) {
+            this.key = await crypto.subtle.generateKey(
+                { name: this.algorithm, length: 256 },
+                true,
+                ['encrypt', 'decrypt']
+            );
+        }
+        return this.key;
+    }
+
+    async encrypt(data) {
+        const key = await this.generateKey();
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encoded = new TextEncoder().encode(data);
+        
+        const encrypted = await crypto.subtle.encrypt(
+            { name: this.algorithm, iv: iv },
+            key,
+            encoded
+        );
+
+        const result = new Uint8Array(iv.length + encrypted.byteLength);
+        result.set(iv, 0);
+        result.set(new Uint8Array(encrypted), iv.length);
+        
+        return btoa(String.fromCharCode(...result));
+    }
+
+    async decrypt(encryptedData) {
+        try {
+            const key = await this.generateKey();
+            const data = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
+            const iv = data.slice(0, 12);
+            const encrypted = data.slice(12);
+            
+            const decrypted = await crypto.subtle.decrypt(
+                { name: this.algorithm, iv: iv },
+                key,
+                encrypted
+            );
+            
+            return new TextDecoder().decode(decrypted);
+        } catch (error) {
+            console.error('Decryption error:', error);
+            return null;
+        }
+    }
+}
+
+// ============ BULK IMPORT MANAGER ============
+class BulkImportManager {
+    constructor() {
+        this.encryption = new EncryptionService();
+        this.batchSize = 50;
+        this.maxFileSize = 10 * 1024 * 1024; // 10MB
+    }
+
+    validateCSV(content) {
+        const lines = content.split('\n').filter(line => line.trim());
+        if (lines.length < 2) return { valid: false, error: 'File is empty or has no data' };
+        
+        const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+        const required = ['name', 'secret', 'platform'];
+        const missing = required.filter(field => !headers.includes(field));
+        
+        if (missing.length > 0) {
+            return { valid: false, error: `Missing required fields: ${missing.join(', ')}` };
+        }
+        
+        return { valid: true, headers };
+    }
+
+    validateJSON(content) {
+        try {
+            const data = JSON.parse(content);
+            if (!Array.isArray(data)) {
+                return { valid: false, error: 'JSON must be an array of accounts' };
+            }
+            
+            if (data.length === 0) {
+                return { valid: false, error: 'No accounts found in JSON' };
+            }
+
+            const required = ['name', 'secret', 'platform'];
+            const invalidAccounts = data.filter(account => 
+                !required.every(field => account[field])
+            );
+
+            if (invalidAccounts.length > 0) {
+                return { valid: false, error: `${invalidAccounts.length} accounts missing required fields` };
+            }
+
+            return { valid: true, data };
+        } catch (error) {
+            return { valid: false, error: 'Invalid JSON format' };
+        }
+    }
+
+    parseCSV(content, headers) {
+        const lines = content.split('\n').filter(line => line.trim());
+        const headerMap = lines[0].split(',').map(h => h.trim().toLowerCase());
+        
+        return lines.slice(1).map((line, index) => {
+            const values = this.parseCSVLine(line);
+            const account = {};
+            
+            headerMap.forEach((header, i) => {
+                if (values[i]) {
+                    account[header] = values[i].trim();
+                }
+            });
+
+            return {
+                id: `imported_${Date.now()}_${index}`,
+                name: account.name || 'Imported Account',
+                secret: account.secret,
+                platform: account.platform || 'custom',
+                issuer: account.issuer || account.platform || 'Unknown',
+                type: account.type || 'TOTP',
+                group: account.group || 'default',
+                username: account.username || '',
+                cookies: account.cookies ? JSON.parse(account.cookies) : null,
+                icon: this.getPlatformIcon(account.platform),
+                added: new Date(),
+                lastUsed: null
+            };
+        }).filter(account => account.secret); // Remove accounts without secrets
+    }
+
+    parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current);
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        
+        result.push(current);
+        return result;
+    }
+
+    getPlatformIcon(platform) {
+        const icons = {
+            'reddit': 'reddit',
+            'twitter': 'twitter-x',
+            'facebook': 'facebook',
+            'google': 'google',
+            'instagram': 'instagram',
+            'linkedin': 'linkedin',
+            'github': 'github',
+            'microsoft': 'microsoft',
+            'apple': 'apple',
+            'amazon': 'amazon'
+        };
+        return icons[platform?.toLowerCase()] || 'person-badge';
+    }
+
+    async processFile(file) {
+        return new Promise((resolve, reject) => {
+            if (file.size > this.maxFileSize) {
+                reject(new Error('File size too large. Maximum 10MB allowed.'));
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+                try {
+                    const content = e.target.result;
+                    let accounts = [];
+                    let validation;
+
+                    if (file.type === 'application/json' || file.name.endsWith('.json')) {
+                        validation = this.validateJSON(content);
+                        if (validation.valid) {
+                            accounts = validation.data.map((account, index) => ({
+                                id: `imported_${Date.now()}_${index}`,
+                                name: account.name,
+                                secret: account.secret,
+                                platform: account.platform || 'custom',
+                                issuer: account.issuer || account.platform || 'Unknown',
+                                type: account.type || 'TOTP',
+                                group: account.group || 'default',
+                                username: account.username || '',
+                                cookies: account.cookies || null,
+                                icon: this.getPlatformIcon(account.platform),
+                                added: new Date(),
+                                lastUsed: null
+                            }));
+                        }
+                    } else {
+                        validation = this.validateCSV(content);
+                        if (validation.valid) {
+                            accounts = this.parseCSV(content, validation.headers);
+                        }
+                    }
+
+                    if (!validation.valid) {
+                        reject(new Error(validation.error));
+                        return;
+                    }
+
+                    // Encrypt cookies if present
+                    for (let account of accounts) {
+                        if (account.cookies && typeof account.cookies === 'object') {
+                            account.encryptedCookies = await this.encryption.encrypt(
+                                JSON.stringify(account.cookies)
+                            );
+                            delete account.cookies;
+                        }
+                    }
+
+                    resolve(accounts);
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            reader.onerror = () => reject(new Error('Failed to read file'));
+            reader.readAsText(file);
+        });
+    }
+
+    async processInBatches(accounts, progressCallback) {
+        const results = {
+            success: [],
+            failed: [],
+            total: accounts.length
+        };
+
+        for (let i = 0; i < accounts.length; i += this.batchSize) {
+            const batch = accounts.slice(i, i + this.batchSize);
+            
+            for (const account of batch) {
+                try {
+                    // Validate TOTP secret format (basic validation)
+                    if (account.type === 'TOTP' && !this.isValidSecret(account.secret)) {
+                        throw new Error('Invalid TOTP secret format');
+                    }
+
+                    results.success.push(account);
+                } catch (error) {
+                    results.failed.push({
+                        account,
+                        error: error.message
+                    });
+                }
+            }
+
+            if (progressCallback) {
+                progressCallback(i + batch.length, accounts.length);
+            }
+
+            // Small delay to prevent UI blocking
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        return results;
+    }
+
+    isValidSecret(secret) {
+        // Basic Base32 validation (should only contain A-Z2-7 and = for padding)
+        return /^[A-Z2-7]+=*$/.test(secret.toUpperCase());
+    }
+
+    getImportTemplate(format) {
+        if (format === 'json') {
+            return JSON.stringify([
+                {
+                    "name": "Account Name",
+                    "secret": "JBSWY3DPEHPK3PXP",
+                    "platform": "google",
+                    "issuer": "Google",
+                    "type": "TOTP",
+                    "group": "work",
+                    "username": "user@example.com"
+                },
+                {
+                    "name": "Cookie Account",
+                    "secret": "",
+                    "platform": "reddit",
+                    "type": "Cookie",
+                    "group": "personal",
+                    "username": "reddit_user",
+                    "cookies": [
+                        {
+                            "name": "session",
+                            "value": "encrypted_cookie_value",
+                            "domain": ".reddit.com",
+                            "path": "/",
+                            "expires": "2024-12-31T23:59:59.000Z",
+                            "secure": true,
+                            "httponly": true
+                        }
+                    ]
+                }
+            ], null, 2);
+        } else {
+            return `name,secret,platform,issuer,type,group,username
+Google Account,JBSWY3DPEHPK3PXP,google,Google,TOTP,work,user@example.com
+Reddit Account,,reddit,Reddit,Cookie,personal,reddit_user`;
+        }
+    }
+}
+
+// ============ COOKIE MANAGER ============
+class CookieManager {
+    constructor() {
+        this.encryption = new EncryptionService();
+        this.platforms = {
+            'reddit': { domains: ['.reddit.com', 'www.reddit.com'], icon: 'reddit' },
+            'twitter': { domains: ['.twitter.com', '.x.com'], icon: 'twitter-x' },
+            'facebook': { domains: ['.facebook.com'], icon: 'facebook' },
+            'google': { domains: ['.google.com'], icon: 'google' },
+            'instagram': { domains: ['.instagram.com'], icon: 'instagram' },
+            'linkedin': { domains: ['.linkedin.com'], icon: 'linkedin' }
+        };
+    }
+
+    async encryptCookies(cookies) {
+        const encrypted = await this.encryption.encrypt(JSON.stringify(cookies));
+        return encrypted;
+    }
+
+    async decryptCookies(encryptedData) {
+        try {
+            const decrypted = await this.encryption.decrypt(encryptedData);
+            return decrypted ? JSON.parse(decrypted) : null;
+        } catch (error) {
+            console.error('Failed to decrypt cookies:', error);
+            return null;
+        }
+    }
+
+    validateCookie(cookie) {
+        const required = ['name', 'value', 'domain'];
+        const missing = required.filter(field => !cookie[field]);
+        
+        if (missing.length > 0) {
+            return { valid: false, error: `Missing required fields: ${missing.join(', ')}` };
+        }
+
+        if (cookie.expires && isNaN(new Date(cookie.expires).getTime())) {
+            return { valid: false, error: 'Invalid expiration date' };
+        }
+
+        return { valid: true };
+    }
+
+    getCookieExpiryStatus(expires) {
+        if (!expires) return 'session';
+        
+        const expiryDate = new Date(expires);
+        const now = new Date();
+        const daysUntilExpiry = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilExpiry < 0) return 'expired';
+        if (daysUntilExpiry < 7) return 'expiring';
+        return 'valid';
+    }
+
+    formatCookieForExport(cookies) {
+        return cookies.map(cookie => ({
+            ...cookie,
+            expires: cookie.expires ? new Date(cookie.expires).toISOString() : null,
+            status: this.getCookieExpiryStatus(cookie.expires)
+        }));
+    }
+
+    async copyCookiesToClipboard(cookies) {
+        try {
+            const cookieString = cookies.map(c => 
+                `${c.name}=${c.value}; Domain=${c.domain}; Path=${c.path || '/'}; ${
+                    c.expires ? `Expires=${new Date(c.expires).toUTCString()}; ` : ''
+                }${c.secure ? 'Secure; ' : ''}${c.httponly ? 'HttpOnly; ' : ''}`
+            ).join('\n');
+            
+            await navigator.clipboard.writeText(cookieString);
+            return true;
+        } catch (error) {
+            console.error('Failed to copy cookies:', error);
+            return false;
+        }
+    }
+}
+
+// ============ FILTER MANAGER ============
+class FilterManager {
+    constructor() {
+        this.filters = {
+            search: '',
+            group: 'all',
+            platform: 'all',
+            type: 'all',
+            sortBy: 'name',
+            sortOrder: 'asc'
+        };
+    }
+
+    applyFilters(accounts, filters) {
+        this.filters = { ...this.filters, ...filters };
+        
+        return accounts.filter(account => {
+            // Search filter
+            if (this.filters.search) {
+                const searchTerm = this.filters.search.toLowerCase();
+                const searchable = [
+                    account.name,
+                    account.username,
+                    account.issuer,
+                    account.platform,
+                    account.group
+                ].join(' ').toLowerCase();
+                
+                if (!searchable.includes(searchTerm)) return false;
+            }
+
+            // Group filter
+            if (this.filters.group !== 'all' && account.group !== this.filters.group) {
+                return false;
+            }
+
+            // Platform filter
+            if (this.filters.platform !== 'all' && account.platform !== this.filters.platform) {
+                return false;
+            }
+
+            // Type filter
+            if (this.filters.type !== 'all' && account.type !== this.filters.type) {
+                return false;
+            }
+
+            return true;
+        }).sort((a, b) => {
+            // Sorting
+            let aValue = a[this.filters.sortBy] || '';
+            let bValue = b[this.filters.sortBy] || '';
+            
+            if (this.filters.sortBy === 'added') {
+                aValue = new Date(aValue);
+                bValue = new Date(bValue);
+            }
+            
+            if (this.filters.sortOrder === 'asc') {
+                return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+            } else {
+                return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+            }
+        });
+    }
+
+    getAvailableGroups(accounts) {
+        const groups = new Set(accounts.map(acc => acc.group).filter(Boolean));
+        return ['all', ...Array.from(groups).sort()];
+    }
+
+    getAvailablePlatforms(accounts) {
+        const platforms = new Set(accounts.map(acc => acc.platform).filter(Boolean));
+        return ['all', ...Array.from(platforms).sort()];
+    }
+
+    getAvailableTypes(accounts) {
+        const types = new Set(accounts.map(acc => acc.type).filter(Boolean));
+        return ['all', ...Array.from(types).sort()];
+    }
+
+    getFilterStats(accounts) {
+        const filtered = this.applyFilters(accounts, this.filters);
+        return {
+            total: accounts.length,
+            filtered: filtered.length,
+            groups: this.getAvailableGroups(accounts).length - 1,
+            platforms: this.getAvailablePlatforms(accounts).length - 1
+        };
+    }
+}
+
+// ============ LAZY TOKEN ENGINE ============
+class LazyTOTPEngine extends RealTOTPEngine {
+    constructor() {
+        super();
+        this.visibleAccounts = new Set();
+        this.updateInterval = 1000;
+        this.isRunning = false;
+        this.lastUpdate = Date.now();
+    }
+
+    setVisibleAccounts(accountIds) {
+        this.visibleAccounts = new Set(accountIds);
+        
+        // Start/stop updates based on visibility
+        if (this.visibleAccounts.size > 0 && !this.isRunning) {
+            this.startLazyUpdates();
+        } else if (this.visibleAccounts.size === 0 && this.isRunning) {
+            this.stopLazyUpdates();
+        }
+    }
+
+    startLazyUpdates() {
+        if (this.isRunning) return;
+        
+        this.isRunning = true;
+        const update = () => {
+            if (!this.isRunning) return;
+            
+            const now = Date.now();
+            const elapsed = now - this.lastUpdate;
+            
+            if (elapsed >= this.updateInterval) {
+                this.updateVisibleTokens();
+                this.lastUpdate = now;
+            }
+            
+            requestAnimationFrame(update);
+        };
+        
+        requestAnimationFrame(update);
+    }
+
+    stopLazyUpdates() {
+        this.isRunning = false;
+    }
+
+    updateVisibleTokens() {
+        this.visibleAccounts.forEach(accountId => {
+            const account = this.accounts.get(accountId);
+            if (!account) return;
+
+            const token = this.generateTOTP(account.secret);
+            const timeLeft = 30 - (Math.floor(Date.now() / 1000) % 30);
+            
+            window.dispatchEvent(new CustomEvent('realTokenUpdate', {
+                detail: {
+                    accountId,
+                    token: this.formatToken(token),
+                    timeLeft,
+                    valid: timeLeft > 3,
+                    rawToken: token
+                }
+            }));
+        });
+    }
+
+    // Override to use lazy updates
+    startRealTimeUpdates(accountId) {
+        // Don't start individual intervals - handled by lazy updates
+    }
+
+    addAccount(accountId, name, secret, issuer = 'Unknown', type = 'TOTP', group = 'default') {
+        const account = {
+            id: accountId,
+            name,
+            secret,
+            issuer,
+            type,
+            group,
+            backupCodes: this.generateBackupCodes(),
+            added: new Date(),
+            lastUsed: null
+        };
+
+        this.accounts.set(accountId, account);
+        return account;
+    }
+}
+
+// ============ ENHANCED AUTHFLOW SPA ============
+class EnhancedAuthFlowSPA extends AuthFlowSPA {
+    constructor() {
+        super();
+        this.bulkImportManager = new BulkImportManager();
+        this.cookieManager = new CookieManager();
+        this.filterManager = new FilterManager();
+        this.totpEngine = new LazyTOTPEngine(); // Replace with lazy engine
+        
+        // Enhanced data structures
+        this.accountGroups = new Map();
+        this.cookieAccounts = new Map();
+        
+        this.initEnhancedFeatures();
+    }
+
+    initEnhancedFeatures() {
+        this.setupBulkImport();
+        this.setupEnhancedFiltering();
+        this.setupCookieManagement();
+    }
+
+    // ============ BULK IMPORT SYSTEM ============
+
+    setupBulkImport() {
+        // This will be called when the accounts page is rendered
+    }
+
+    showBulkImportModal() {
+        const modalHtml = `
+            <div class="modal fade" id="bulkImportModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-upload"></i>
+                                Bulk Import Accounts
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="import-options">
+                                <div class="option-card active" data-format="json">
+                                    <i class="bi bi-file-code"></i>
+                                    <h6>JSON Import</h6>
+                                    <p>Import from JSON format with full account data</p>
+                                </div>
+                                <div class="option-card" data-format="csv">
+                                    <i class="bi bi-file-text"></i>
+                                    <h6>CSV Import</h6>
+                                    <p>Import from CSV with basic account information</p>
+                                </div>
+                            </div>
+
+                            <div class="import-instructions">
+                                <h6><i class="bi bi-info-circle"></i> Supported Format</h6>
+                                <div class="code-preview" id="formatPreview">
+                                    <!-- Dynamic content -->
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary mt-2" onclick="authFlowApp.downloadTemplate()">
+                                    <i class="bi bi-download"></i>
+                                    Download Template
+                                </button>
+                            </div>
+
+                            <div class="file-upload-area mt-4">
+                                <input type="file" id="importFile" accept=".json,.csv" class="d-none">
+                                <div class="upload-placeholder" id="uploadPlaceholder">
+                                    <i class="bi bi-cloud-upload"></i>
+                                    <p>Choose file or drag & drop here</p>
+                                    <small>Supports JSON and CSV files (max 10MB)</small>
+                                </div>
+                                <div class="upload-preview" id="uploadPreview" style="display: none;">
+                                    <div class="file-info">
+                                        <i class="bi bi-file-text"></i>
+                                        <div>
+                                            <div class="file-name" id="fileName"></div>
+                                            <div class="file-size" id="fileSize"></div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="authFlowApp.clearFile()">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="import-options mt-4">
+                                <div class="form-group">
+                                    <label class="form-label">Default Group</label>
+                                    <input type="text" class="form-control" id="defaultGroup" placeholder="work, personal, client1, etc.">
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="validateSecrets" checked>
+                                    <label class="form-check-label">Validate TOTP secrets during import</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="startImportBtn" disabled>
+                                <i class="bi bi-play-circle"></i>
+                                Start Import
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add modal to DOM if not exists
+        if (!document.getElementById('bulkImportModal')) {
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('bulkImportModal'));
+        this.setupImportModalEvents();
+        modal.show();
+    }
+
+    setupImportModalEvents() {
+        // Format selection
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                this.updateFormatPreview(card.dataset.format);
+            });
+        });
+
+        // File upload
+        const fileInput = document.getElementById('importFile');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        const uploadPreview = document.getElementById('uploadPreview');
+
+        uploadPlaceholder.addEventListener('click', () => fileInput.click());
+        uploadPlaceholder.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadPlaceholder.classList.add('dragover');
+        });
+        uploadPlaceholder.addEventListener('dragleave', () => {
+            uploadPlaceholder.classList.remove('dragover');
+        });
+        uploadPlaceholder.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadPlaceholder.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                this.handleFileSelect(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                this.handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Start import button
+        document.getElementById('startImportBtn').addEventListener('click', () => {
+            this.processBulkImport();
+        });
+
+        // Initial format preview
+        this.updateFormatPreview('json');
+    }
+
+    updateFormatPreview(format) {
+        const template = this.bulkImportManager.getImportTemplate(format);
+        const preview = document.getElementById('formatPreview');
+        
+        if (format === 'json') {
+            preview.innerHTML = `<pre><code>${template}</code></pre>`;
+        } else {
+            preview.textContent = template;
+        }
+    }
+
+    handleFileSelect(file) {
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        const uploadPreview = document.getElementById('uploadPreview');
+        const startImportBtn = document.getElementById('startImportBtn');
+
+        fileName.textContent = file.name;
+        fileSize.textContent = this.formatFileSize(file.size);
+        
+        uploadPlaceholder.style.display = 'none';
+        uploadPreview.style.display = 'flex';
+        startImportBtn.disabled = false;
+    }
+
+    clearFile() {
+        const fileInput = document.getElementById('importFile');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        const uploadPreview = document.getElementById('uploadPreview');
+        const startImportBtn = document.getElementById('startImportBtn');
+
+        fileInput.value = '';
+        uploadPlaceholder.style.display = 'flex';
+        uploadPreview.style.display = 'none';
+        startImportBtn.disabled = true;
+    }
+
+    async processBulkImport() {
+        const fileInput = document.getElementById('importFile');
+        const file = fileInput.files[0];
+        const defaultGroup = document.getElementById('defaultGroup').value || 'imported';
+        const validateSecrets = document.getElementById('validateSecrets').checked;
+
+        if (!file) return;
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('bulkImportModal'));
+        modal.hide();
+
+        // Show progress modal
+        this.showImportProgress();
+
+        try {
+            // Parse file
+            const accounts = await this.bulkImportManager.processFile(file);
+            
+            // Apply default group
+            accounts.forEach(account => {
+                if (!account.group || account.group === 'default') {
+                    account.group = defaultGroup;
+                }
+            });
+
+            // Process in batches
+            const results = await this.bulkImportManager.processInBatches(
+                accounts, 
+                (processed, total) => {
+                    this.updateImportProgress(processed, total);
+                }
+            );
+
+            // Add successful accounts
+            for (const account of results.success) {
+                this.totpEngine.addAccount(
+                    account.id,
+                    account.name,
+                    account.secret,
+                    account.issuer,
+                    account.type,
+                    account.group
+                );
+
+                if (account.type === 'Cookie' && account.encryptedCookies) {
+                    this.cookieAccounts.set(account.id, {
+                        encryptedData: account.encryptedCookies,
+                        platform: account.platform
+                    });
+                }
+            }
+
+            // Show results
+            this.showImportResults(results);
+
+        } catch (error) {
+            this.showImportError(error.message);
+        }
+    }
+
+    showImportProgress() {
+        const progressHtml = `
+            <div class="modal fade" id="importProgressModal" tabindex="-1" data-bs-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-arrow-repeat spinner"></i>
+                                Importing Accounts
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="progress mb-3">
+                                <div class="progress-bar" id="importProgressBar" style="width: 0%"></div>
+                            </div>
+                            <div class="text-center">
+                                <div id="importStatus">Processing...</div>
+                                <small class="text-muted" id="importCount">0/0 accounts</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if (!document.getElementById('importProgressModal')) {
+            document.body.insertAdjacentHTML('beforeend', progressHtml);
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('importProgressModal'));
+        modal.show();
+    }
+
+    updateImportProgress(processed, total) {
+        const progressBar = document.getElementById('importProgressBar');
+        const importStatus = document.getElementById('importStatus');
+        const importCount = document.getElementById('importCount');
+
+        if (progressBar) {
+            const percent = Math.round((processed / total) * 100);
+            progressBar.style.width = `${percent}%`;
+            importStatus.textContent = `Processed ${processed} of ${total} accounts`;
+            importCount.textContent = `${processed}/${total} accounts`;
+        }
+    }
+
+    showImportResults(results) {
+        const progressModal = bootstrap.Modal.getInstance(document.getElementById('importProgressModal'));
+        if (progressModal) progressModal.hide();
+
+        const resultsHtml = `
+            <div class="modal fade" id="importResultsModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-check-circle text-success"></i>
+                                Import Complete
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="import-summary">
+                                <div class="summary-item success">
+                                    <i class="bi bi-check-circle"></i>
+                                    <div>
+                                        <strong>${results.success.length}</strong>
+                                        <span>Successful</span>
+                                    </div>
+                                </div>
+                                <div class="summary-item failed">
+                                    <i class="bi bi-x-circle"></i>
+                                    <div>
+                                        <strong>${results.failed.length}</strong>
+                                        <span>Failed</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${results.failed.length > 0 ? `
+                                <div class="failed-accounts mt-3">
+                                    <h6>Failed Imports:</h6>
+                                    <div class="failed-list">
+                                        ${results.failed.slice(0, 5).map(failed => `
+                                            <div class="failed-item">
+                                                <div class="failed-name">${failed.account.name}</div>
+                                                <div class="failed-error">${failed.error}</div>
+                                            </div>
+                                        `).join('')}
+                                        ${results.failed.length > 5 ? `
+                                            <div class="text-muted">... and ${results.failed.length - 5} more</div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            ${results.failed.length > 0 ? `
+                                <button type="button" class="btn btn-outline-primary" onclick="authFlowApp.downloadFailedReport(${JSON.stringify(results.failed)})">
+                                    <i class="bi bi-download"></i>
+                                    Download Failed Report
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', resultsHtml);
+        const modal = new bootstrap.Modal(document.getElementById('importResultsModal'));
+        modal.show();
+
+        // Refresh accounts page
+        this.navigate('accounts');
+    }
+
+    // ============ ENHANCED ACCOUNT MANAGEMENT ============
+
+    getEnhancedAccountsTemplate() {
+        const stats = this.filterManager.getFilterStats(this.accounts);
+        const groups = this.filterManager.getAvailableGroups(this.accounts);
+        const platforms = this.filterManager.getAvailablePlatforms(this.accounts);
+        const types = this.filterManager.getAvailableTypes(this.accounts);
+
+        return `
+            <div class="app-wrapper">
+                <header class="app-header">
+                    <div class="app-container">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="#" data-route="dashboard" class="logo">
+                                <i class="bi bi-shield-check"></i>
+                                <span>AuthFlow Pro</span>
+                            </a>
+                            
+                            <div class="d-flex align-items-center gap-4">
+                                <nav class="d-flex gap-3 nav-menu">
+                                    <a href="#" data-route="dashboard" class="nav-link">Dashboard</a>
+                                    <a href="#" data-route="accounts" class="nav-link">Accounts</a>
+                                    <a href="#" data-route="users" class="nav-link active">Users</a>
+                                    <a href="#" data-route="api-keys" class="nav-link">API Keys</a>
+                                    <a href="#" data-route="security-logs" class="nav-link">Security Logs</a>
+                                </nav>
+                                
+                                <div class="dropdown">
+                                    <div class="user-avatar" id="userMenu" data-bs-toggle="dropdown">
+                                        <span>${this.userData?.initials || 'JD'}</span>
+                                    </div>
+                                    <ul class="dropdown-menu dropdown-menu-dark">
+                                        <li><a class="dropdown-item" href="#" data-route="settings"><i class="bi bi-gear"></i> Settings</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="app-container">
+                    <div class="dashboard-section">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h1 class="section-title">
+                                <i class="bi bi-person-badge"></i>
+                                Account Management
+                            </h1>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary" onclick="authFlowApp.showBulkImportModal()">
+                                    <i class="bi bi-upload"></i>
+                                    Bulk Import
+                                </button>
+                                <button class="btn btn-outline-primary" onclick="authFlowApp.exportAccounts()">
+                                    <i class="bi bi-download"></i>
+                                    Export
+                                </button>
+                                <button class="btn btn-primary" id="addAccountBtn">
+                                    <i class="bi bi-plus-circle"></i>
+                                    Add Account
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Filtering -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Search</label>
+                                        <input type="text" class="form-control" id="searchFilter" 
+                                               placeholder="Search accounts...">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Group</label>
+                                        <select class="form-control" id="groupFilter">
+                                            ${groups.map(group => `
+                                                <option value="${group}">${group === 'all' ? 'All Groups' : group}</option>
+                                            `).join('')}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Platform</label>
+                                        <select class="form-control" id="platformFilter">
+                                            ${platforms.map(platform => `
+                                                <option value="${platform}">${platform === 'all' ? 'All Platforms' : platform}</option>
+                                            `).join('')}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Type</label>
+                                        <select class="form-control" id="typeFilter">
+                                            ${types.map(type => `
+                                                <option value="${type}">${type === 'all' ? 'All Types' : type}</option>
+                                            `).join('')}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Sort By</label>
+                                        <select class="form-control" id="sortFilter">
+                                            <option value="name">Name</option>
+                                            <option value="added">Date Added</option>
+                                            <option value="platform">Platform</option>
+                                            <option value="group">Group</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <div class="filter-stats">
+                                            Showing <strong>${stats.filtered}</strong> of <strong>${stats.total}</strong> accounts
+                                            <span class="text-muted">• ${stats.groups} groups • ${stats.platforms} platforms</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Accounts Grid -->
+                        <div class="accounts-grid-enhanced" id="accountsGrid">
+                            ${this.getFilteredAccounts().map(account => this.getEnhancedAccountCard(account)).join('')}
+                        </div>
+                    </div>
+                </main>
+            </div>
+        `;
+    }
+
+    getEnhancedAccountCard(account) {
+        const isCookieAccount = account.type === 'Cookie';
+        const hasCookies = this.cookieAccounts.has(account.id);
+        
+        return `
+            <div class="account-card-enhanced ${isCookieAccount ? 'cookie-account' : 'totp-account'}" 
+                 data-account-id="${account.id}" 
+                 data-group="${account.group}" 
+                 data-platform="${account.platform}" 
+                 data-type="${account.type}">
+                
+                <div class="account-header">
+                    <div class="account-badge-group">${account.group}</div>
+                    <div class="account-type-badge ${isCookieAccount ? 'cookie' : 'totp'}">
+                        <i class="bi bi-${isCookieAccount ? 'shield-lock' : 'clock'}"></i>
+                        ${isCookieAccount ? 'Cookie' : 'TOTP'}
+                    </div>
+                </div>
+
+                <div class="account-content">
+                    <div class="platform-icon platform-${account.platform}">
+                        <i class="bi bi-${account.icon}"></i>
+                    </div>
+                    <div class="account-info">
+                        <div class="account-name">${account.name}</div>
+                        <div class="account-username">${account.username || account.issuer}</div>
+                        <div class="account-meta">
+                            <span class="meta-item">
+                                <i class="bi bi-tags"></i>
+                                ${account.group}
+                            </span>
+                            <span class="meta-item">
+                                <i class="bi bi-${account.platform === 'custom' ? 'person-badge' : account.platform}"></i>
+                                ${account.platform}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="account-actions">
+                    ${isCookieAccount ? this.getCookieActions(account) : this.getTOTPActions(account)}
+                </div>
+
+                ${!isCookieAccount ? `
+                    <div class="token-section">
+                        <div class="token-display">
+                            <span class="token-code" id="token-${account.id}">Loading...</span>
+                            <span class="token-timer" id="timer-${account.id}">Calculating...</span>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    getTOTPActions(account) {
+        return `
+            <button class="btn btn-sm btn-outline-primary" onclick="authFlowApp.copyToken('${account.id}')">
+                <i class="bi bi-clipboard"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="authFlowApp.showAccountDetails('${account.id}')">
+                <i class="bi bi-info-circle"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="authFlowApp.removeAccount('${account.id}')">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+    }
+
+    getCookieActions(account) {
+        const hasCookies = this.cookieAccounts.has(account.id);
+        
+        return `
+            <button class="btn btn-sm btn-outline-success" onclick="authFlowApp.manageCookies('${account.id}')"
+                    ${!hasCookies ? 'disabled' : ''}>
+                <i class="bi bi-shield-lock"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="authFlowApp.showAccountDetails('${account.id}')">
+                <i class="bi bi-info-circle"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="authFlowApp.removeAccount('${account.id}')">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+    }
+
+    // ============ COOKIE MANAGEMENT ============
+
+    setupCookieManagement() {
+        // Cookie management event listeners
+    }
+
+    async manageCookies(accountId) {
+        const cookieData = this.cookieAccounts.get(accountId);
+        if (!cookieData) return;
+
+        const cookies = await this.cookieManager.decryptCookies(cookieData.encryptedData);
+        if (!cookies) {
+            alert('Failed to decrypt cookies');
+            return;
+        }
+
+        this.showCookieManager(accountId, cookies, cookieData.platform);
+    }
+
+    showCookieManager(accountId, cookies, platform) {
+        const modalHtml = `
+            <div class="modal fade" id="cookieManagerModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-shield-lock"></i>
+                                Cookie Management
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="cookie-summary mb-4">
+                                <div class="platform-icon platform-${platform}">
+                                    <i class="bi bi-${this.cookieManager.platforms[platform]?.icon || 'shield-lock'}"></i>
+                                </div>
+                                <div>
+                                    <h6>${this.getAccountById(accountId)?.name}</h6>
+                                    <div class="cookie-count">${cookies.length} cookies stored</div>
+                                </div>
+                            </div>
+
+                            <div class="cookie-list">
+                                ${cookies.map((cookie, index) => `
+                                    <div class="cookie-item ${this.cookieManager.getCookieExpiryStatus(cookie.expires)}">
+                                        <div class="cookie-info">
+                                            <div class="cookie-name">${cookie.name}</div>
+                                            <div class="cookie-domain">${cookie.domain}</div>
+                                            <div class="cookie-meta">
+                                                <span>Expires: ${cookie.expires ? new Date(cookie.expires).toLocaleDateString() : 'Session'}</span>
+                                                <span>•</span>
+                                                <span>${cookie.secure ? 'Secure' : 'Not Secure'}</span>
+                                                <span>•</span>
+                                                <span>${cookie.httponly ? 'HTTP Only' : 'Not HTTP Only'}</span>
+                                            </div>
+                                        </div>
+                                        <div class="cookie-actions">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="authFlowApp.copyCookieValue('${accountId}', ${index})">
+                                                <i class="bi bi-clipboard"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="authFlowApp.exportCookies('${accountId}')">
+                                <i class="bi bi-download"></i>
+                                Export Cookies
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="authFlowApp.copyAllCookies('${accountId}')">
+                                <i class="bi bi-clipboard-check"></i>
+                                Copy All Cookies
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if (!document.getElementById('cookieManagerModal')) {
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('cookieManagerModal'));
+        modal.show();
+    }
+
+    async copyCookieValue(accountId, cookieIndex) {
+        const cookieData = this.cookieAccounts.get(accountId);
+        if (!cookieData) return;
+
+        const cookies = await this.cookieManager.decryptCookies(cookieData.encryptedData);
+        if (cookies && cookies[cookieIndex]) {
+            await navigator.clipboard.writeText(cookies[cookieIndex].value);
+            this.showToast('Cookie value copied to clipboard', 'success');
+        }
+    }
+
+    async copyAllCookies(accountId) {
+        const cookieData = this.cookieAccounts.get(accountId);
+        if (!cookieData) return;
+
+        const cookies = await this.cookieManager.decryptCookies(cookieData.encryptedData);
+        if (cookies) {
+            const success = await this.cookieManager.copyCookiesToClipboard(cookies);
+            if (success) {
+                this.showToast('All cookies copied to clipboard', 'success');
+            } else {
+                this.showToast('Failed to copy cookies', 'error');
+            }
+        }
+    }
+
+    async exportCookies(accountId) {
+        const cookieData = this.cookieAccounts.get(accountId);
+        if (!cookieData) return;
+
+        const cookies = await this.cookieManager.decryptCookies(cookieData.encryptedData);
+        if (cookies) {
+            const exportData = this.cookieManager.formatCookieForExport(cookies);
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cookies-${accountId}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    }
+
+    // ============ ENHANCED FILTERING ============
+
+    setupEnhancedFiltering() {
+        // Filtering will be handled in the accounts page initialization
+    }
+
+    getFilteredAccounts() {
+        const filters = {
+            search: document.getElementById('searchFilter')?.value || '',
+            group: document.getElementById('groupFilter')?.value || 'all',
+            platform: document.getElementById('platformFilter')?.value || 'all',
+            type: document.getElementById('typeFilter')?.value || 'all',
+            sortBy: document.getElementById('sortFilter')?.value || 'name',
+            sortOrder: 'asc'
+        };
+
+        return this.filterManager.applyFilters(this.accounts, filters);
+    }
+
+    // ============ EXPORT FUNCTIONALITY ============
+
+    exportAccounts() {
+        const filteredAccounts = this.getFilteredAccounts();
+        const exportData = filteredAccounts.map(account => ({
+            name: account.name,
+            secret: account.secret,
+            platform: account.platform,
+            issuer: account.issuer,
+            type: account.type,
+            group: account.group,
+            username: account.username,
+            added: account.added,
+            lastUsed: account.lastUsed
+        }));
+
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `authflow-accounts-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // ============ UTILITY METHODS ============
+
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    showToast(message, type = 'info') {
+        // Simple toast implementation
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-content">
+                <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    getAccountById(accountId) {
+        return this.accounts.find(acc => acc.id === accountId);
+    }
+
+    // Override the original accounts template
+    getAccountsTemplate() {
+        return this.getEnhancedAccountsTemplate();
+    }
+}
+
+// ============ INITIALIZE ENHANCED APP ============
 document.addEventListener('DOMContentLoaded', () => {
-    window.authFlowApp = new AuthFlowSPA();
+    window.authFlowApp = new EnhancedAuthFlowSPA();
 });
