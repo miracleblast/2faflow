@@ -1,4 +1,3 @@
-
 // ============ AUTHFLOW PRO - COMPLETE SPA PWA ============
 // Real TOTP + License System + Team Management
 
@@ -379,6 +378,22 @@ class AuthFlowSPA {
 
         this.currentPage = page;
         this.renderPage(page);
+        
+        // Show/hide global footer based on page
+        this.toggleGlobalFooter(page);
+    }
+
+    toggleGlobalFooter(page) {
+        const footer = document.getElementById('globalAuthFooter');
+        if (!footer) return;
+
+        // Show footer only on auth pages (license, login, register)
+        const authPages = ['license', 'login', 'register'];
+        if (authPages.includes(page)) {
+            footer.style.display = 'block';
+        } else {
+            footer.style.display = 'none';
+        }
     }
 
     async renderPage(page) {
@@ -509,90 +524,6 @@ class AuthFlowSPA {
                         Need a license? <a href="#" onclick="authFlowApp.showPricingModal()" class="auth-link">View Pricing</a>
                     </div>
                 </div>
-
-                <!-- Footer for onboarding pages -->
-                <footer class="auth-footer">
-                    <div class="footer-content">
-                        <div class="footer-links">
-                            <a href="#" onclick="authFlowApp.showTerms()">Terms of Service</a>
-                            <a href="#" onclick="authFlowApp.showPrivacy()">Privacy Policy</a>
-                            <a href="mailto:support@harambee.com">Support</a>
-                        </div>
-                        <div class="footer-copyright">
-                            &copy; 2024 Harambee. All rights reserved.
-                        </div>
-                    </div>
-                </footer>
-            </div>
-
-            <!-- Pricing Modal -->
-            <div class="modal fade" id="pricingModal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Choose Your Plan</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="pricing-grid">
-                                <div class="pricing-card">
-                                    <div class="pricing-header">
-                                        <h3>Starter</h3>
-                                        <div class="price">$9.99<span>/month</span></div>
-                                        <p class="price-description">Perfect for freelancers</p>
-                                    </div>
-                                    <ul class="features-list">
-                                        <li><i class="bi bi-check"></i> Up to 10 accounts</li>
-                                        <li><i class="bi bi-check"></i> 3 team members</li>
-                                        <li><i class="bi bi-check"></i> Basic 2FA management</li>
-                                        <li><i class="bi bi-x"></i> API Access</li>
-                                        <li><i class="bi bi-x"></i> Priority Support</li>
-                                    </ul>
-                                    <button class="btn btn-outline-primary w-100" onclick="authFlowApp.selectPlan('starter')">
-                                        Select Starter
-                                    </button>
-                                </div>
-
-                                <div class="pricing-card featured">
-                                    <div class="pricing-badge">Most Popular</div>
-                                    <div class="pricing-header">
-                                        <h3>Professional</h3>
-                                        <div class="price">$15.99<span>/month</span></div>
-                                        <p class="price-description">Ideal for agencies</p>
-                                    </div>
-                                    <ul class="features-list">
-                                        <li><i class="bi bi-check"></i> Up to 50 accounts</li>
-                                        <li><i class="bi bi-check"></i> 10 team members</li>
-                                        <li><i class="bi bi-check"></i> Advanced 2FA management</li>
-                                        <li><i class="bi bi-check"></i> API Access</li>
-                                        <li><i class="bi bi-check"></i> Priority Support</li>
-                                    </ul>
-                                    <button class="btn btn-primary w-100" onclick="authFlowApp.selectPlan('professional')">
-                                        Select Professional
-                                    </button>
-                                </div>
-
-                                <div class="pricing-card">
-                                    <div class="pricing-header">
-                                        <h3>Enterprise</h3>
-                                        <div class="price">$49.99<span>/month</span></div>
-                                        <p class="price-description">For large teams</p>
-                                    </div>
-                                    <ul class="features-list">
-                                        <li><i class="bi bi-check"></i> Unlimited accounts</li>
-                                        <li><i class="bi bi-check"></i> 25+ team members</li>
-                                        <li><i class="bi bi-check"></i> Enterprise features</li>
-                                        <li><i class="bi bi-check"></i> Full API Access</li>
-                                        <li><i class="bi bi-check"></i> 24/7 Premium Support</li>
-                                    </ul>
-                                    <button class="btn btn-outline-primary w-100" onclick="authFlowApp.selectPlan('enterprise')">
-                                        Select Enterprise
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         `;
     }
@@ -646,19 +577,6 @@ class AuthFlowSPA {
                         <a href="#" data-route="register" class="auth-link">Sign up</a>
                     </div>
                 </div>
-
-                <footer class="auth-footer">
-                    <div class="footer-content">
-                        <div class="footer-links">
-                            <a href="#" onclick="authFlowApp.showTerms()">Terms of Service</a>
-                            <a href="#" onclick="authFlowApp.showPrivacy()">Privacy Policy</a>
-                            <a href="mailto:support@harambee.com">Support</a>
-                        </div>
-                        <div class="footer-copyright">
-                            &copy; 2024 Harambee. All rights reserved.
-                        </div>
-                    </div>
-                </footer>
             </div>
         `;
     }
@@ -725,19 +643,6 @@ class AuthFlowSPA {
                         <a href="#" data-route="login" class="auth-link">Sign in</a>
                     </div>
                 </div>
-
-                <footer class="auth-footer">
-                    <div class="footer-content">
-                        <div class="footer-links">
-                            <a href="#" onclick="authFlowApp.showTerms()">Terms of Service</a>
-                            <a href="#" onclick="authFlowApp.showPrivacy()">Privacy Policy</a>
-                            <a href="mailto:support@harambee.com">Support</a>
-                        </div>
-                        <div class="footer-copyright">
-                            &copy; 2024 Harambee. All rights reserved.
-                        </div>
-                    </div>
-                </footer>
             </div>
         `;
     }
@@ -778,6 +683,7 @@ class AuthFlowSPA {
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item" href="#" data-route="settings"><i class="bi bi-gear"></i> Settings</a></li>
                                         <li><a class="dropdown-item text-warning" href="#" onclick="authFlowApp.showPricingModal()"><i class="bi bi-arrow-repeat"></i> Upgrade Plan</a></li>
+                                        <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
                                     </ul>
                                 </div>
@@ -2279,8 +2185,8 @@ POST /api/v1/tokens/generate<br>
 
     // New methods for enhanced functionality
     showPricingModal() {
-        // In a real app, you would show a Bootstrap modal
-        alert('Redirecting to pricing page...\n\nStarter: $9.99/month\nProfessional: $15.99/month\nEnterprise: $49.99/month');
+        const modal = new bootstrap.Modal(document.getElementById('globalPricingModal'));
+        modal.show();
     }
 
     selectPlan(plan) {
