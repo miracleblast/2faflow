@@ -46,7 +46,7 @@
     --bs-secondary-bg: #1e293b;
     --bs-tertiary-color: #cbd5e1;
     --bs-tertiary-color-rgb: 203, 213, 225;
-    --bs-tertiary-bg: #334155;
+    --bs-tertiary-bg: #132c4e;
     
     /* Bootstrap Border Colors */
     --bs-border-color: rgba(255, 255, 255, 0.2);
@@ -457,9 +457,9 @@ p {
 
 /* Header & Navigation - IMPROVED TEXT VISIBILITY */
 .app-header {
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.95);
     padding: 1rem 0;
     position: sticky;
     top: 0;
@@ -528,7 +528,7 @@ p {
 }
 
 .auth-card {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
     backdrop-filter: blur(25px);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--border-radius-xl);
@@ -779,7 +779,7 @@ p {
 /* ===== ENHANCED CARD STYLES ===== */
 /* ===== ENHANCED CARD STYLES ===== */
 .card {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--border-radius-lg);
     backdrop-filter: blur(20px);
@@ -848,7 +848,7 @@ p {
 }
 
 .stat-card {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.15) 100%);
+    background: linear-gradient(135deg, rgba(7, 11, 20, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
     border: 1px solid rgba(0, 0, 0, 0.3);
     border-radius: var(--border-radius-lg);
     padding: 1.5rem;
@@ -883,9 +883,9 @@ p {
 }
 
 .account-card-enhanced {
-    background: var rgba(0, 0, 0, 0.95);
+    background: var rgba(17, 22, 44);
     border-radius: var(--border-radius);
-    border: 1px solid var rgba(0, 0, 0, 0.95);
+    border: 1px solid var rgba(17, 22, 44);
     overflow: hidden;
     transition: all 0.3s ease;
 }
@@ -1034,7 +1034,7 @@ p {
 
 /* Dropdown */
 .dropdown-menu {
-    background: rgba(15, 34, 42, 0.98);
+    background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius);
@@ -1281,7 +1281,7 @@ p {
 }
 
 .account-card-large {
-    background: linear-gradient(135deg, rgba(15, 39, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+    background: linear-gradient(135deg, rgba(17, 22, 44) 0%, rgba(17, 22, 44) 100%);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--border-radius-lg);
     padding: 1.5rem;
@@ -1485,9 +1485,9 @@ p {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(15, 23, 42, 0.95);
     padding: 1.5rem 0;
     z-index: 1000;
 }
@@ -2407,7 +2407,7 @@ p {
 }
 
 .account-card-enhanced {
-    background: rgba(0, 0, 0, 0.95);
+    background: rgb(17, 22, 44);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
     overflow: hidden;
@@ -2510,7 +2510,7 @@ p {
 
 .token-section {
     padding: 1rem;
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(223, 223, 223, 0.1);
     border-top: 1px solid var(--border-color);
 }
 
@@ -2524,7 +2524,7 @@ p {
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: rgba(11, 21, 26, 0.8); /* Improved background */
+    background: rgba(6, 15, 29, 0.856); /* Improved background */
     border-radius: var(--border-radius);
     margin-bottom: 0.75rem;
     transition: var(--transition);
@@ -2532,7 +2532,7 @@ p {
 }
 
 .account-card:hover {
-    border-color: rgba(99, 189, 241, 0.3);
+    border-color: rgba(25, 33, 148, 0.3);
     transform: translateX(4px);
     background: rgba(255, 255, 255, 0.12);
 }
