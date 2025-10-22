@@ -1,72 +1,310 @@
-/* ===== AUTHFLOW PRO - MODERN STYLING ===== */
-/* Import Poppins Font */
+/* ===== AUTHFLOW PRO - BOOTSTRAP VARIABLE OVERRIDES ===== */
+/* Import All Required Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
+/* OVERRIDE BOOTSTRAP CSS VARIABLES */
 :root {
-    /* Color System - IMPROVED CONTRAST */
-    --primary: #5a8585;
-    --primary-dark: #0a0a0a;
-    --primary-light: #cddbdf;
-    --secondary: #98c4cf;
+    /* Bootstrap Color Overrides */
+    --bs-blue: #3b82f6;
+    --bs-indigo: #6366f1;
+    --bs-purple: #8b5cf6;
+    --bs-pink: #ec4899;
+    --bs-red: #ef4444;
+    --bs-orange: #f59e0b;
+    --bs-yellow: #eab308;
+    --bs-green: #10b981;
+    --bs-teal: #14b8a6;
+    --bs-cyan: #06b6d4;
+    --bs-black: #000000;
+    --bs-white: #ffffff;
+    --bs-gray: #6b7280;
+    --bs-gray-dark: #374151;
+    
+    /* Bootstrap Theme Colors */
+    --bs-primary: #3b82f6;
+    --bs-secondary: #6b7280;
+    --bs-success: #10b981;
+    --bs-info: #06b6d4;
+    --bs-warning: #f59e0b;
+    --bs-danger: #ef4444;
+    --bs-light: #f8fafc;
+    --bs-dark: #1f2937;
+    
+    /* Bootstrap Body Colors */
+    --bs-body-color: #ffffff;
+    --bs-body-bg: #0a0f1a;
+    --bs-body-color-rgb: 255, 255, 255;
+    --bs-body-bg-rgb: 10, 15, 26;
+    
+    /* Bootstrap Text Colors */
+    --bs-emphasis-color: #ffffff;
+    --bs-emphasis-color-rgb: 255, 255, 255;
+    --bs-secondary-color: #e2e8f0;
+    --bs-secondary-color-rgb: 226, 232, 240;
+    --bs-secondary-bg: #1e293b;
+    --bs-tertiary-color: #cbd5e1;
+    --bs-tertiary-color-rgb: 203, 213, 225;
+    --bs-tertiary-bg: #334155;
+    
+    /* Bootstrap Border Colors */
+    --bs-border-color: rgba(255, 255, 255, 0.2);
+    --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
+    
+    /* Bootstrap Headings */
+    --bs-heading-color: #ffffff;
+    
+    /* Bootstrap Link Colors */
+    --bs-link-color: #3b82f6;
+    --bs-link-hover-color: #60a5fa;
+    
+    /* Bootstrap Code Colors */
+    --bs-code-color: #ec4899;
+    
+    /* Bootstrap Form Colors */
+    --bs-form-valid-color: #10b981;
+    --bs-form-valid-border-color: #10b981;
+    --bs-form-invalid-color: #ef4444;
+    --bs-form-invalid-border-color: #ef4444;
+    
+    /* Bootstrap Card Colors */
+    --bs-card-bg: rgba(30, 41, 59, 0.95);
+    --bs-card-cap-color: #ffffff;
+    --bs-card-cap-bg: rgba(255, 255, 255, 0.03);
+    --bs-card-border-color: rgba(255, 255, 255, 0.2);
+    
+    /* CUSTOM COLOR SYSTEM - HIGH CONTRAST */
+    --primary: #3b82f6;
+    --primary-dark: #1e40af;
+    --primary-light: #60a5fa;
+    --secondary: #93c5fd;
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
-    --dark: #171718;
-    --darker: #000000;
+    --dark: #0f172a;
+    --darker: #020617;
     --light: #f8fafc;
     
-    /* IMPROVED TEXT COLORS - MUCH BETTER CONTRAST */
-    --gray-100: #f8fafc;
+    /* IMPROVED TEXT COLORS - HIGH CONTRAST */
+    --gray-100: #ffffff;
     --gray-200: #f1f5f9;
     --gray-300: #e2e8f0;
     --gray-400: #cbd5e1;
     --gray-500: #94a3b8;
-    --gray-600: #8894a5;
-    --gray-700: #4e545c;
-    --gray-800: #31353a;
-    --gray-900: #23262b;
+    --gray-600: #64748b;
+    --gray-700: #475569;
+    --gray-800: #334155;
+    --gray-900: #1e293b;
     
-    /* App Specific - IMPROVED CONTRAST */
-    --bg-primary: var(--darker);
-    --bg-secondary: var(--gray-900);
-    --bg-tertiary: var(--gray-800);
+    /* App Specific - HIGH CONTRAST */
+    --bg-primary: #0a0f1a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
     
-    /* CRITICAL FIX: Much lighter text colors and ADDED MISSING VARIABLES */
+    /* CRITICAL FIX: High contrast text colors */
     --text-primary: #ffffff;
     --text-secondary: #e2e8f0;
     --text-tertiary: #cbd5e1;
-    --text-muted: #e4e8ee;
+    --text-muted: #94a3b8;
     --text-color: #ffffff;
-    --card-bg: rgba(15, 23, 42, 0.95);
-    --border-color: rgba(255, 255, 255, 0.15);
-    --primary-color: #5a8585;
+    --card-bg: rgba(30, 41, 59, 0.95);
+    --border-color: rgba(255, 255, 255, 0.2);
+    --primary-color: #3b82f6;
     
     --accent-primary: var(--primary);
     --accent-secondary: var(--primary-light);
     
     /* RGB values for rgba usage */
-    --primary-rgb: 90, 133, 133;
+    --primary-rgb: 59, 130, 246;
     --success-rgb: 16, 185, 129;
     --warning-rgb: 245, 158, 11;
     --danger-rgb: 239, 68, 68;
     --info-rgb: 59, 130, 246;
     
-    /* Enhanced Border Radius - More rounded */
+    /* KEEP ALL ORIGINAL BORDER RADIUS VALUES */
     --border-radius: 16px;
     --border-radius-lg: 20px;
     --border-radius-xl: 28px;
     --border-radius-xxl: 40px;
     
-    /* Enhanced Shadows - More depth */
+    /* KEEP ALL ORIGINAL SHADOWS */
     --shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 15px 35px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
     --shadow-xl: 0 25px 50px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
     --shadow-xxl: 0 35px 60px -12px rgba(0, 0, 0, 0.6);
     
-    /* Enhanced Transitions */
+    /* KEEP ALL ORIGINAL TRANSITIONS */
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Force Bootstrap components to use our colors */
+body {
+    color: var(--bs-body-color) !important;
+    background-color: var(--bs-body-bg) !important;
+}
+
+.card {
+    background-color: var(--bs-card-bg) !important;
+    border-color: var(--bs-card-border-color) !important;
+}
+
+.card-header {
+    color: var(--bs-card-cap-color) !important;
+    background-color: var(--bs-card-cap-bg) !important;
+    border-bottom-color: var(--bs-border-color) !important;
+}
+
+.btn-outline-primary {
+    color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    background: transparent !important;
+}
+
+.btn-outline-primary:hover {
+    color: var(--bs-white) !important;
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+}
+
+.table {
+    --bs-table-color: var(--bs-body-color) !important;
+    --bs-table-bg: transparent !important;
+    --bs-table-border-color: var(--bs-border-color) !important;
+}
+
+.table th {
+    color: var(--bs-secondary-color) !important;
+}
+
+/* Base Styles with Font Stack */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', 'Roboto', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Rest of your existing CSS continues exactly as before... */
+/* ===== PARTICLE BACKGROUND - UPDATED COLORS ===== */
+.particles-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(135deg, #0a0f1a 0%, #1e293b 50%, #334155 100%);
+    overflow: hidden;
+}
+
+/* Continue with all your existing CSS styles... */
+
+/* Add this specific fix for any remaining Bootstrap overrides */
+.text-dark {
+    color: var(--text-primary) !important;
+}
+
+.text-body {
+    color: var(--text-primary) !important;
+}
+
+.bg-light {
+    background-color: var(--bg-secondary) !important;
+}
+
+.bg-white {
+    background-color: var(--bg-secondary) !important;
+}
+
+.text-black-50 {
+    color: var(--text-secondary) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Fix modal backdrop */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.modal-content {
+    background-color: var(--bs-card-bg) !important;
+    border-color: var(--bs-border-color) !important;
+}
+
+/* Fix dropdowns */
+.dropdown-menu {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--bs-border-color) !important;
+}
+
+.dropdown-item {
+    color: var(--text-primary) !important;
+}
+
+.dropdown-item:hover {
+    background-color: var(--primary) !important;
+    color: white !important;
+}
+
+/* Fix form controls */
+.form-control {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--bs-border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.form-control:focus {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    border-color: var(--bs-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Fix alerts */
+.alert {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--bs-border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Fix badges */
+.badge {
+    color: white !important;
+}
+
+/* Fix pagination */
+.page-link {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--bs-border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.page-link:hover {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: white !important;
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
 }
 
 
